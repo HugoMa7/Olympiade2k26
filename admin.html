@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Olympiades de l'Apéro 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:  #002395;
+      --red:   #ED2939;
+      --gold:  #C9A84C;
+      --gold2: #F5D380;
+      --cream: #F5ECD7;
+      --dark:  #1A0A00;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #0d0a14;
+      color: var(--cream);
+      font-family: 'Cinzel', serif;
+    }
+
+    /* ── Login overlay ── */
+    #loginOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.92);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 1rem;
+    }
+
+    .login-box {
+      background: linear-gradient(160deg, rgba(26,10,0,.98), rgba(10,6,20,.98));
+      border: 1px solid rgba(201,168,76,.4);
+      border-radius: 8px;
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 8px 40px rgba(0,0,0,.7);
+    }
+
+    .login-box h2 {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.1rem;
+      background: linear-gradient(135deg, var(--gold2), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 1.8rem;
+      letter-spacing: .1em;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: .7rem 1rem;
+      font-family: 'Cinzel', serif;
+      font-size: .9rem;
+      color: var(--cream);
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(201,168,76,.35);
+      border-radius: 5px;
+      outline: none;
+      text-align: center;
+      letter-spacing: .2em;
+      margin-bottom: 1rem;
+      transition: border-color .2s;
+    }
+    .login-box input:focus { border-color: var(--gold); }
+
+    .login-btn {
+      width: 100%;
+      padding: .7rem;
+      font-family: 'Cinzel Decorative', serif;
+      font-size: .85rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      color: var(--dark);
+      background: linear-gradient(135deg, var(--gold2), var(--gold));
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: filter .2s, transform .2s;
+    }
+    .login-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+    .login-error {
+      margin-top: .8rem;
+      font-size: .75rem;
+      color: var(--red);
+      letter-spacing: .1em;
+      min-height: 1rem;
+    }
+
+    /* ── Main layout ── */
+    #app { display: none; max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+
+    /* ── Header ── */
+    .admin-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(201,168,76,.25);
+    }
+
+    .admin-title {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: clamp(1rem, 3vw, 1.4rem);
+      background: linear-gradient(135deg, var(--gold2), var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      letter-spacing: .08em;
+    }
+
+    .admin-meta {
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: .8rem;
+      color: rgba(245,236,215,.4);
+    }
+
+    .btn-logout {
+      font-family: 'Cinzel', serif;
+      font-size: .7rem;
+      letter-spacing: .15em;
+      color: rgba(245,236,215,.5);
+      background: transparent;
+      border: 1px solid rgba(245,236,215,.2);
+      border-radius: 4px;
+      padding: .35rem .9rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: color .2s, border-color .2s;
+    }
+    .btn-logout:hover { color: var(--red); border-color: var(--red); }
+
+    /* ── Stats bar ── */
+    .stats-bar {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      background: rgba(201,168,76,.07);
+      border: 1px solid rgba(201,168,76,.2);
+      border-radius: 6px;
+      padding: .7rem 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: .2rem;
+    }
+    .stat-card .stat-num {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.6rem;
+      color: var(--gold);
+    }
+    .stat-card .stat-label {
+      font-size: .65rem;
+      letter-spacing: .18em;
+      color: rgba(245,236,215,.45);
+      text-transform: uppercase;
+    }
+
+    /* ── Search ── */
+    .search-wrap {
+      margin-bottom: 1.2rem;
+      position: relative;
+    }
+    .search-wrap input {
+      width: 100%;
+      padding: .6rem 1rem .6rem 2.4rem;
+      font-family: 'Cinzel', serif;
+      font-size: .85rem;
+      color: var(--cream);
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(201,168,76,.25);
+      border-radius: 5px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .search-wrap input::placeholder { color: rgba(245,236,215,.25); }
+    .search-wrap input:focus { border-color: var(--gold); }
+    .search-icon {
+      position: absolute;
+      left: .75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: .4;
+      font-size: .9rem;
+      pointer-events: none;
+    }
+
+    /* ── Teams list ── */
+    #teamsList { display: flex; flex-direction: column; gap: .75rem; }
+
+    .team-row {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(201,168,76,.18);
+      border-radius: 6px;
+      padding: 1rem 1.2rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: .5rem 1rem;
+      align-items: start;
+      transition: border-color .2s;
+      animation: fadeIn .3s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    .team-row:hover { border-color: rgba(201,168,76,.4); }
+
+    .team-row-left { min-width: 0; }
+
+    .team-name-display {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: .95rem;
+      color: var(--gold2);
+      margin-bottom: .5rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    .team-date {
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: .72rem;
+      color: rgba(245,236,215,.3);
+      margin-left: auto;
+      white-space: nowrap;
+    }
+
+    .members-inline {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .3rem .8rem;
+    }
+    .member-tag {
+      font-size: .75rem;
+      color: rgba(245,236,215,.65);
+      display: flex;
+      align-items: center;
+      gap: .3rem;
+    }
+    .member-tag::before { content: '⚑'; color: var(--gold); font-size: .6rem; opacity: .6; }
+
+    .btn-delete {
+      background: transparent;
+      border: 1px solid rgba(237,41,57,.35);
+      color: rgba(237,41,57,.6);
+      border-radius: 4px;
+      padding: .4rem .8rem;
+      font-family: 'Cinzel', serif;
+      font-size: .65rem;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background .2s, color .2s, border-color .2s;
+      white-space: nowrap;
+      align-self: start;
+    }
+    .btn-delete:hover {
+      background: rgba(237,41,57,.12);
+      color: var(--red);
+      border-color: var(--red);
+    }
+
+    /* ── Empty state ── */
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: rgba(245,236,215,.25);
+      font-family: 'IM Fell English', serif;
+      font-style: italic;
+      font-size: 1rem;
+    }
+
+    /* ── Loading ── */
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: rgba(245,236,215,.3);
+      font-size: .8rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+    }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background: rgba(26,10,0,.95);
+      border: 1px solid rgba(201,168,76,.4);
+      border-radius: 6px;
+      padding: .7rem 1.2rem;
+      font-size: .8rem;
+      color: var(--cream);
+      letter-spacing: .08em;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity .3s, transform .3s;
+      pointer-events: none;
+      z-index: 200;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.error { border-color: rgba(237,41,57,.5); color: var(--red); }
+  </style>
+</head>
+<body>
+
+<!-- Login overlay -->
+<div id="loginOverlay">
+  <div class="login-box">
+    <h2>🔐 Accès Administrateur</h2>
+    <input type="password" id="pwdInput" placeholder="Mot de passe" autocomplete="current-password" />
+    <button class="login-btn" id="loginBtn">Connexion</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
+<!-- Main app -->
+<div id="app">
+  <div class="admin-header">
+    <div>
+      <div class="admin-title">🏆 Olympiades de l'Apéro — Admin</div>
+      <div class="admin-meta">Proissans · 20 Juin 2026</div>
+    </div>
+    <button class="btn-logout" id="btnLogout">Déconnexion</button>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-card">
+      <span class="stat-num" id="statTeams">—</span>
+      <span class="stat-label">Équipes inscrites</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num" id="statAthletes">—</span>
+      <span class="stat-label">Athlètes total</span>
+    </div>
+  </div>
+
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="Rechercher une équipe ou un athlète…" />
+  </div>
+
+  <div id="teamsList"><div class="loading">Chargement…</div></div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  let adminPassword = '';
+  let allTeams = [];
+
+  // ── Login ────────────────────────────────────────────────────────────────────
+  function tryLogin() {
+    const pwd = document.getElementById('pwdInput').value;
+    if (!pwd) return;
+    adminPassword = pwd;
+    loadTeams()
+      .then(() => {
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+      })
+      .catch(err => {
+        adminPassword = '';
+        const el = document.getElementById('loginError');
+        el.textContent = err.message === '401' ? 'Mot de passe incorrect.' : 'Erreur de connexion.';
+      });
+  }
+
+  document.getElementById('loginBtn').addEventListener('click', tryLogin);
+  document.getElementById('pwdInput').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+
+  document.getElementById('btnLogout').addEventListener('click', () => {
+    adminPassword = '';
+    allTeams = [];
+    document.getElementById('pwdInput').value = '';
+    document.getElementById('loginError').textContent = '';
+    document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+  });
+
+  // ── API calls ────────────────────────────────────────────────────────────────
+  function loadTeams() {
+    return fetch('/api/teams', { headers: { 'X-Admin-Password': adminPassword } })
+      .then(res => {
+        if (res.status === 401) throw new Error('401');
+        if (!res.ok) throw new Error('server');
+        return res.json();
+      })
+      .then(data => {
+        allTeams = data.teams || [];
+        renderTeams(allTeams);
+        updateStats();
+      });
+  }
+
+  function deleteTeam(id) {
+    return fetch(`/api/teams/${id}`, {
+      method: 'DELETE',
+      headers: { 'X-Admin-Password': adminPassword },
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('delete failed');
+      allTeams = allTeams.filter(t => t.id !== id);
+      renderTeams(filterTeams(document.getElementById('searchInput').value));
+      updateStats();
+      showToast('Équipe supprimée.', false);
+    })
+    .catch(() => showToast('Erreur lors de la suppression.', true));
+  }
+
+  // ── Render ───────────────────────────────────────────────────────────────────
+  function updateStats() {
+    document.getElementById('statTeams').textContent = allTeams.length;
+    document.getElementById('statAthletes').textContent = allTeams.length * 4;
+  }
+
+  function filterTeams(query) {
+    if (!query.trim()) return allTeams;
+    const q = query.toLowerCase();
+    return allTeams.filter(t =>
+      t.teamName.toLowerCase().includes(q) ||
+      t.members.some(m => (m.first + ' ' + m.last).toLowerCase().includes(q))
+    );
+  }
+
+  function formatDate(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' })
+      + ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function renderTeams(teams) {
+    const list = document.getElementById('teamsList');
+    if (teams.length === 0) {
+      list.innerHTML = '<div class="empty-state">Aucune équipe inscrite pour le moment.</div>';
+      return;
+    }
+
+    list.innerHTML = [...teams].reverse().map(t => `
+      <div class="team-row" id="row-${t.id}">
+        <div class="team-row-left">
+          <div class="team-name-display">
+            🏆 ${escHtml(t.teamName)}
+            <span class="team-date">${formatDate(t.createdAt)}</span>
+          </div>
+          <div class="members-inline">
+            ${t.members.map(m => `<span class="member-tag">${escHtml(m.first)} ${escHtml(m.last.toUpperCase())}</span>`).join('')}
+          </div>
+        </div>
+        <button class="btn-delete" onclick="confirmDelete('${t.id}', '${escAttr(t.teamName)}')">✕ Supprimer</button>
+      </div>
+    `).join('');
+  }
+
+  function escHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function escAttr(str) {
+    return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
+  }
+
+  function confirmDelete(id, name) {
+    if (!confirm(`Supprimer l'équipe "${name}" ?`)) return;
+    deleteTeam(id);
+  }
+
+  // ── Search ───────────────────────────────────────────────────────────────────
+  document.getElementById('searchInput').addEventListener('input', e => {
+    renderTeams(filterTeams(e.target.value));
+  });
+
+  // ── Toast ────────────────────────────────────────────────────────────────────
+  let toastTimer;
+  function showToast(msg, isError) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = 'show' + (isError ? ' error' : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.className = '', 3000);
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+services:
+  olympiades:
+    container_name: olympiades
+    image: ${IMAGE:-ghcr.io/hugom/olympiade2k26:latest}
+    ports:
+      - "3501:80"
+    restart: always
+    environment:
+      - PORT=80
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    volumes:
+      - olympiades_data:/app/data
+    networks:
+      - web
+
+volumes:
+  olympiades_data:
+
+networks:
+  web:
+    external: true
+    name: web
