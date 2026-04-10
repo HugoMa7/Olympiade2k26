@@ -28,18 +28,31 @@
       overflow-x: hidden;
     }
 
-    /* ── Tricolor stripe background ── */
+    /* ── French flag background ── */
     .tricolor-bg {
       position: fixed;
       inset: 0;
-      display: flex;
       z-index: 0;
-      opacity: .08;
+      background:
+        /* dark tint for readability */
+        linear-gradient(rgba(10,6,20,.52), rgba(10,6,20,.52)),
+        /* diagonal light sheen — simulates fabric */
+        linear-gradient(148deg, rgba(255,255,255,.07) 0%, transparent 48%, rgba(0,0,0,.14) 100%),
+        /* top & bottom vignette */
+        linear-gradient(180deg, rgba(0,0,0,.38) 0%, transparent 28%, transparent 72%, rgba(0,0,0,.38) 100%),
+        /* flag — each stripe lighter in center, darker at edges */
+        linear-gradient(90deg,
+          #000E5C 0%,
+          #002395 16%,
+          #001878 33.33%,
+          #D5D5D5 33.33%,
+          #FFFFFF 50%,
+          #D5D5D5 66.66%,
+          #B8001A 66.66%,
+          #ED2939 83%,
+          #960012 100%
+        );
     }
-    .tricolor-bg span { flex: 1; }
-    .tricolor-bg span:nth-child(1) { background: var(--blue); }
-    .tricolor-bg span:nth-child(2) { background: #fff; }
-    .tricolor-bg span:nth-child(3) { background: var(--red); }
 
     /* ── Floating particles ── */
     .particles { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
@@ -506,9 +519,7 @@
 <body>
 
   <!-- Background -->
-  <div class="tricolor-bg">
-    <span></span><span></span><span></span>
-  </div>
+  <div class="tricolor-bg"></div>
   <div class="particles" id="particles"></div>
 
   <!-- Stars -->
